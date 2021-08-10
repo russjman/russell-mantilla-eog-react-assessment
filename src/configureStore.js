@@ -1,5 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
-import metricsReducer from './Features/Metrics/reducer';
+import metricsReducer from './Features/Metrics/metricsSlice';
 
 const store = configureStore({
   reducer: {

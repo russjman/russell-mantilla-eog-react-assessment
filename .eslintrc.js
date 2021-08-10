@@ -3,7 +3,6 @@ module.exports = {
     browser: true,
     es6: true,
     commonjs: true,
-    es6: true,
     node: true,
   },
   parser: '@typescript-eslint/parser', // Specifies the ESLint parser
