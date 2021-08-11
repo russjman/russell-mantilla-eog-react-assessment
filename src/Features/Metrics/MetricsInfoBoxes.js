@@ -1,31 +1,48 @@
-import React from 'react';
-import { useSelector } from 'react-redux';
+import React, { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import {
+  CircularProgress,
   Container,
   Card,
   CardContent,
   Grid,
+  Typography,
 } from '@material-ui/core';
 
+import { fetchSelectedMetricsInfo } from './metricsSlice';
+
 export default function MetricsInfoBoxes() {
+  const dispatch = useDispatch();
+  const stateStatus = useSelector(state => state.metrics.status);
   const selectedMetrics = useSelector(state => state.metrics.selected);
-  // const [ metricsInfo, setMetricsInfo ] = useState([]);
+  const selectedMetricsInfo = useSelector(state => state.metrics.selectedInfo);
 
-  console.log('MetricsInfoBoxes', selectedMetrics);
+  useEffect(() => {
+    if (selectedMetrics.length) {
+      dispatch(fetchSelectedMetricsInfo(selectedMetrics));
+    }
+  }, [selectedMetrics]);
 
-  const renderCard = (metric) => (
+  console.log('MetricsInfoBoxes', selectedMetrics, selectedMetricsInfo);
+
+  const renderCard = (item) => (
     <Card>
       <CardContent>
-        <h3>{metric}</h3>
+        <Typography variant="h5" gutterBottom>{item.metric} @ {item.at}</Typography>
+        <Typography variant="h3">{item.value}{item.unit}</Typography>
       </CardContent>
     </Card>
   );
   return (
     <Container>
-      <h2>Info</h2>
-      <Grid container spacing={2}>
-        {selectedMetrics.map(m => <Grid xs={4} key={m} item>{renderCard(m)}</Grid>)}
-      </Grid>
+      <Typography variant="h2" align="center">Info</Typography>
+      { stateStatus === 'loading' && <CircularProgress color="secondary" align="center" />}
+      { stateStatus === 'success' && (
+        <Grid container spacing={2}>
+          {selectedMetricsInfo.map(m => <Grid xs={4} key={m} item>{renderCard(m)}</Grid>)}
+        </Grid>
+      )}
+
     </Container>
   );
 }

@@ -10,10 +10,19 @@ export const fetchAllMetrics = createAsyncThunk('metrics/fetchAllMetrics', async
   return data.getMetrics;
 });
 
-export const fetchSelectedMetricInfo = createAsyncThunk('metrics/fetchSelectedMetricInfo', async () => {
-  const query = gql`{ getMetrics }`;
-  const data = await graphQLClient.request(query);
-  return data.getMetrics;
+export const fetchSelectedMetricsInfo = createAsyncThunk('metrics/fetchSelectedMetricInfo', async (selectedMetrics) => {
+  const query = gql`query ($metricName: String!) {
+    getLastKnownMeasurement(metricName: $metricName) {
+      metric,
+      at,
+      value,
+      unit,
+    }
+  }`;
+
+  const promises = selectedMetrics.map(m => graphQLClient.request(query, { metricName: m }));
+  const data = await Promise.all(promises);
+  return data.map(m => m.getLastKnownMeasurement);
 });
 
 export const metricsSlice = createSlice({
@@ -38,7 +47,7 @@ export const metricsSlice = createSlice({
     },
     deselectMetric: (state, action) => {
       const selectedMetrics = [...state.selected];
-      state.selected = selectedMetrics.filter(m => m === action.payload);
+      state.selected = selectedMetrics.filter(m => m !== action.payload);
     },
   },
   extraReducers: {
@@ -50,6 +59,17 @@ export const metricsSlice = createSlice({
       state.all = action.payload;
     },
     [fetchAllMetrics.rejected]: (state, action) => {
+      state.status = 'failed';
+      state.error = action.error.message;
+    },
+    [fetchSelectedMetricsInfo.pending]: (state) => {
+      state.status = 'loading';
+    },
+    [fetchSelectedMetricsInfo.fulfilled]: (state, action) => {
+      state.status = 'success';
+      state.selectedInfo = action.payload;
+    },
+    [fetchSelectedMetricsInfo.rejected]: (state, action) => {
       state.status = 'failed';
       state.error = action.error.message;
     },
