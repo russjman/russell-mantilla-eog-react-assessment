@@ -9,28 +9,9 @@ import {
 
 export default function MetricsInfoBoxes() {
   const selectedMetrics = useSelector(state => state.metrics.selected);
+  // const [ metricsInfo, setMetricsInfo ] = useState([]);
 
   console.log('MetricsInfoBoxes', selectedMetrics);
-
-  const multipleMeasurementsQuery = `
-  query($input: [MeasurementQuery]) {
-      getMultipleMeasurements(input: $input) {
-          metric,
-          measurements {
-              at,
-              value
-          }
-      }
-  }`;
-
-  const multipleMeasurementsVariables = [
-    {
-      "metricsName": "oilTemp",
-    },
-    {
-      "metricsName": "waterTemp",
-    },
-  ];
 
   const renderCard = (metric) => (
     <Card>
