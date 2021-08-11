@@ -25,23 +25,29 @@ export default function MetricsInfoBoxes() {
 
   console.log('MetricsInfoBoxes', selectedMetrics, selectedMetricsInfo);
 
-  const renderCard = (item) => (
-    <Card>
-      <CardContent>
-        <Typography variant="h5" gutterBottom>{item.metric} @ {item.at}</Typography>
-        <Typography variant="h3">{item.value}{item.unit}</Typography>
-      </CardContent>
-    </Card>
-  );
+  const renderCard = (item) => {
+    const {
+      metric, unit, at, value,
+    } = item;
+    const timeStamp = new Date(at).toUTCString();
+    return (
+      <Card>
+        <CardContent>
+          <Typography variant="h5" gutterBottom>{metric}</Typography>
+          <Typography variant="h3">{value}{unit}</Typography>
+          <Typography variant="subtitle2" gutterBottom>@{timeStamp}</Typography>
+        </CardContent>
+      </Card>
+    );
+  };
+
   return (
     <Container>
       <Typography variant="h2" align="center">Info</Typography>
       { stateStatus === 'loading' && <CircularProgress color="secondary" align="center" />}
-      { stateStatus === 'success' && (
-        <Grid container spacing={2}>
-          {selectedMetricsInfo.map(m => <Grid xs={4} key={m} item>{renderCard(m)}</Grid>)}
-        </Grid>
-      )}
+      <Grid container spacing={2}>
+        {selectedMetricsInfo.map(m => <Grid key={m.metric} xs={4} item>{renderCard(m)}</Grid>)}
+      </Grid>
 
     </Container>
   );

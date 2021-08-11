@@ -25,6 +25,25 @@ export const fetchSelectedMetricsInfo = createAsyncThunk('metrics/fetchSelectedM
   return data.map(m => m.getLastKnownMeasurement);
 });
 
+export const fetchSelectedMetricsChartData = createAsyncThunk('metrics/fetchSelectedMetricsChartData', async (selectedMetrics) => {
+  const query = gql`query($input: [MeasurementQuery]) {
+    getMultipleMeasurements(input: $input) {
+      metric,
+       measurements {
+        at,
+        value,
+        unit,
+      }
+    }
+  }`;
+  const myCurrentDate = new Date();
+  const oneHourBefore = new Date(myCurrentDate);
+  oneHourBefore.setHours(oneHourBefore.getHours() - 1);
+  const variables = selectedMetrics.map(m => ({ metricName: m, after: oneHourBefore.valueOf() }));
+  const data = await graphQLClient.request(query, { input: [...variables] });
+  return data.getMultipleMeasurements;
+});
+
 export const metricsSlice = createSlice({
   name: 'metrics',
   initialState: {
@@ -62,6 +81,7 @@ export const metricsSlice = createSlice({
       state.status = 'failed';
       state.error = action.error.message;
     },
+
     [fetchSelectedMetricsInfo.pending]: (state) => {
       state.status = 'loading';
     },
@@ -70,6 +90,18 @@ export const metricsSlice = createSlice({
       state.selectedInfo = action.payload;
     },
     [fetchSelectedMetricsInfo.rejected]: (state, action) => {
+      state.status = 'failed';
+      state.error = action.error.message;
+    },
+
+    [fetchSelectedMetricsChartData.pending]: (state) => {
+      state.status = 'loading';
+    },
+    [fetchSelectedMetricsChartData.fulfilled]: (state, action) => {
+      state.status = 'success';
+      state.selectedChartData = action.payload;
+    },
+    [fetchSelectedMetricsChartData.rejected]: (state, action) => {
       state.status = 'failed';
       state.error = action.error.message;
     },
