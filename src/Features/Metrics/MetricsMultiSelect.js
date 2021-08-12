@@ -15,17 +15,16 @@ function MetricsMultiSelect() {
   const metrics = useSelector(state => state.metrics.all);
   const selectedMetrics = useSelector(state => state.metrics.selected);
   const selectHandler = (e) => {
-    const { value: allMetrics } = e.target;
-    const { [allMetrics.length - 1]: newMetric } = allMetrics;
+    const selectedOptions = e.target.value;
+    const newMetric = selectedOptions.filter(m => !selectedMetrics.includes(m));
 
-    if (newMetric && !selectedMetrics.includes(newMetric)) {
-      dispatch(selectMetric(newMetric));
+    if (newMetric.length) {
+      dispatch(selectMetric(newMetric[0]));
     } else {
-      dispatch(deselectMetric(newMetric));
+      const removedMetric = selectedMetrics.filter(m => !selectedOptions.includes(m));
+      dispatch(deselectMetric(removedMetric[0]));
     }
   };
-
-  console.log('MetricsMultiSelect', metrics, selectedMetrics);
 
   useEffect(() => {
     if (!metrics.length) {

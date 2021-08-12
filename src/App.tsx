@@ -1,7 +1,7 @@
 import React from 'react';
 import { ToastContainer } from 'react-toastify';
 import { MuiThemeProvider, createTheme } from '@material-ui/core/styles';
-import CssBaseline from '@material-ui/core/CssBaseline';
+import { Container, Grid, CssBaseline } from '@material-ui/core';
 import 'react-toastify/dist/ReactToastify.css';
 
 import Header from './components/Header';
@@ -30,9 +30,13 @@ const App = () => (
     <CssBaseline />
     <Wrapper>
       <Header />
-      <MetricsMultiSelect />
-      <MetricsInfoBoxes />
-      <MetricsChart />
+      <Container>
+        <MetricsMultiSelect />
+        <Grid spacing={2} container>
+          <Grid sm={3} xs={12} item><MetricsInfoBoxes /></Grid>
+          <Grid sm={9} xs={12} item><MetricsChart /></Grid>
+        </Grid>
+      </Container>
       {/* <NowWhat /> */}
       <ToastContainer />
     </Wrapper>

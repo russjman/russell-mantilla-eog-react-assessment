@@ -30,6 +30,7 @@ export const fetchSelectedMetricsChartData = createAsyncThunk('metrics/fetchSele
     getMultipleMeasurements(input: $input) {
       metric,
        measurements {
+        metric,
         at,
         value,
         unit,
@@ -37,9 +38,9 @@ export const fetchSelectedMetricsChartData = createAsyncThunk('metrics/fetchSele
     }
   }`;
   const myCurrentDate = new Date();
-  const oneHourBefore = new Date(myCurrentDate);
-  oneHourBefore.setHours(oneHourBefore.getHours() - 1);
-  const variables = selectedMetrics.map(m => ({ metricName: m, after: oneHourBefore.valueOf() }));
+  const after = new Date(myCurrentDate);
+  after.setMinutes(after.getMinutes() - 1);
+  const variables = selectedMetrics.map(m => ({ metricName: m, after: after.valueOf() }));
   const data = await graphQLClient.request(query, { input: [...variables] });
   return data.getMultipleMeasurements;
 });
@@ -98,6 +99,15 @@ export const metricsSlice = createSlice({
       state.status = 'loading';
     },
     [fetchSelectedMetricsChartData.fulfilled]: (state, action) => {
+      const payload = [...action.payload];
+
+      // format at to time
+      payload.forEach(metric => {
+        metric.measurements.forEach(point => {
+          const time = new Date(point.at);
+          point.at = time.toTimeString();
+        });
+      });
       state.status = 'success';
       state.selectedChartData = action.payload;
     },
