@@ -2,16 +2,35 @@ import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import {
   Container,
+  IconButton,
+  FormControl,
   Select,
   MenuItem,
   Chip,
   Typography,
+  makeStyles,
 } from '@material-ui/core';
+import ClearIcon from '@material-ui/icons/Clear';
 
-import { deselectMetric, selectMetric, fetchAllMetrics } from './metricsSlice';
+import {
+  deselectMetric, selectMetric, fetchAllMetrics, clearSelectedMetrics,
+} from './metricsSlice';
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    marginBottom: theme.spacing(2),
+    position: 'relative',
+  },
+  button: {
+    position: 'absolute',
+    bottom: 5,
+    right: 50,
+  },
+}));
 
 function MetricsMultiSelect() {
   const dispatch = useDispatch();
+  const classes = useStyles();
   const metrics = useSelector(state => state.metrics.all);
   const selectedMetrics = useSelector(state => state.metrics.selected);
   const selectHandler = (e) => {
@@ -26,6 +45,10 @@ function MetricsMultiSelect() {
     }
   };
 
+  const clearHandler = () => {
+    dispatch(clearSelectedMetrics());
+  };
+
   useEffect(() => {
     if (!metrics.length) {
       dispatch(fetchAllMetrics());
@@ -33,24 +56,28 @@ function MetricsMultiSelect() {
   }, []);
 
   return (
-    <Container>
-      <Typography variant="h2" align="center">Metrics</Typography>
-      <Select
-        id="metrics-multi-select-field"
-        labelId="metrics-multi-select-field"
-        value={selectedMetrics}
-        onChange={selectHandler}
-        multiple
-        renderValue={(selected) => (
-          <div>
-            {selected.map((value) => (
-              <Chip key={value} label={value} />
-            ))}
-          </div>
-        )}
-      >
-        { metrics.map(m => <MenuItem key={m} value={m}>{m}</MenuItem>) }
-      </Select>
+    <Container className={classes.root}>
+      <Typography variant="h1" align="center">Metrics</Typography>
+      <FormControl variant="outlined" fullWidth>
+        <Select
+          id="metrics-multi-select-field"
+          labelId="metrics-multi-select-field"
+          value={selectedMetrics}
+          onChange={selectHandler}
+          multiple
+          renderValue={(selected) => (
+            <div>
+              {selected.map((value) => (
+                <Chip key={value} label={value} />
+              ))}
+            </div>
+          )}
+        >
+          <MenuItem value="" selected><em>-- please select metric --</em></MenuItem>
+          { metrics.map(m => <MenuItem key={m} value={m}>{m}</MenuItem>) }
+        </Select>
+      </FormControl>
+      <IconButton onClick={clearHandler} className={classes.button}><ClearIcon /></IconButton>
     </Container>
   );
 }

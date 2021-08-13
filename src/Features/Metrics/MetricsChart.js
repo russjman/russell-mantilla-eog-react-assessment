@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import {
   Button, Typography, Paper, makeStyles,
@@ -13,15 +13,22 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 
+import useInterval from '../../utils/useInterval';
 import { fetchSelectedMetricsChartData } from './metricsSlice';
 
 const useStyles = makeStyles((theme) => ({
   root: {
     width: '100%',
+    position: 'relative',
   },
   chartContainer: {
     marginBottom: theme.spacing(4),
     width: '100%',
+  },
+  button: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
   },
 }));
 
@@ -29,7 +36,7 @@ export default function MetricsChart() {
   const dispatch = useDispatch();
   const classes = useStyles();
 
-  // const [ isCombined, setCombined ] = useState(false);
+  const [isCombined, setCombined] = useState(true);
   const selectedMetrics = useSelector(state => state.metrics.selected);
   const selectedMetricsChartData = useSelector(state => state.metrics.selectedChartData);
 
@@ -39,23 +46,73 @@ export default function MetricsChart() {
     }
   }, [selectedMetrics]);
 
+  useInterval(() => {
+    dispatch(fetchSelectedMetricsChartData(selectedMetrics));
+  }, selectedMetrics.length ? 10000 : null);
+
+  const getMergedChartData = () => {
+    const mergedLineData = [];
+    selectedMetricsChartData[0].measurements.forEach(m => {
+      mergedLineData.push({
+        at: m.at,
+        [m.metric]: m.value,
+      });
+    });
+
+    mergedLineData.forEach(point => {
+      selectedMetricsChartData.forEach(metric => {
+        const found = metric.measurements.find(m => m.at === point.at);
+        point[metric.metric] = found.value;
+      });
+    });
+
+    return mergedLineData;
+  };
+
   return (
     <div className={classes.root} hidden={selectedMetrics.length === 0}>
-      <Typography variant="h2" align="center">Metrics Chart</Typography>
-      <Button variant="contained" type="button">combined / separate</Button>
-      {selectedMetricsChartData.map(m => (
+      <Typography variant="h3" align="center">Last 30 mins</Typography>
+      <Button variant="contained" type="button" color="secondary" className={classes.button} onClick={() => setCombined(!isCombined)}>combined / separate</Button>
+      {!isCombined && selectedMetricsChartData.map(m => (
         <Paper key={m.metric} elevation={3} className={classes.chartContainer}>
+          <Typography variant="h4">{m.metric}</Typography>
           <ResponsiveContainer width="99%" height={400}>
             <LineChart data={m.measurements}>
               <XAxis dataKey='at' />
               <YAxis domain={['auto', 'auto']} />
               <CartesianGrid stroke='#f5f5f5' />
               <Tooltip filterNull={false} />
-              <Line type='monotone' dataKey='value' stroke='#387908' />
+              <Line
+                dataKey='value'
+                stroke={`#${Math.floor(Math.random() * 16777215).toString(16)}`}
+                dot={false}
+                type='linear'
+              />
             </LineChart>
           </ResponsiveContainer>
         </Paper>
       ))}
+      {isCombined && selectedMetricsChartData.length && (
+        <Paper elevation={3} className={classes.chartContainer}>
+          <ResponsiveContainer width="99%" height={400}>
+            <LineChart data={getMergedChartData()}>
+              <XAxis dataKey='at' />
+              <YAxis domain={['auto', 'auto']} />
+              <CartesianGrid stroke='#f5f5f5' />
+              <Tooltip filterNull={false} />
+              {selectedMetricsChartData.map(m => (
+                <Line
+                  key={m.metric}
+                  dataKey={m.metric}
+                  stroke={`#${Math.floor(Math.random() * 16777215).toString(16)}`}
+                  dot={false}
+                  type='linear'
+                />
+              ))}
+            </LineChart>
+          </ResponsiveContainer>
+        </Paper>
+      )}
     </div>
   );
 }

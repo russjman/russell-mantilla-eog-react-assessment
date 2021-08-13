@@ -1,13 +1,13 @@
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import {
-  CircularProgress,
   Card,
   CardContent,
   Typography,
   makeStyles,
 } from '@material-ui/core';
 
+import useInterval from '../../utils/useInterval';
 import { fetchSelectedMetricsInfo } from './metricsSlice';
 
 const useStyles = makeStyles((theme) => ({
@@ -21,7 +21,6 @@ const useStyles = makeStyles((theme) => ({
 export default function MetricsInfoBoxes() {
   const dispatch = useDispatch();
   const classes = useStyles();
-  const stateStatus = useSelector(state => state.metrics.status);
   const selectedMetrics = useSelector(state => state.metrics.selected);
   const selectedMetricsInfo = useSelector(state => state.metrics.selectedInfo);
 
@@ -31,6 +30,11 @@ export default function MetricsInfoBoxes() {
     }
   }, [selectedMetrics]);
 
+  // recurring chime, doesn't play on prop change.
+  useInterval(() => {
+    dispatch(fetchSelectedMetricsInfo(selectedMetrics));
+  }, selectedMetrics.length ? 10000 : null);
+
   const renderCard = (item) => {
     const {
       metric, unit, at, value,
@@ -39,9 +43,9 @@ export default function MetricsInfoBoxes() {
     return (
       <Card key={metric} className={classes.card}>
         <CardContent>
-          <Typography variant="h5" gutterBottom>{metric}</Typography>
-          <Typography variant="h3">{value}{unit}</Typography>
-          <Typography variant="subtitle2" gutterBottom>@{timeStamp}</Typography>
+          <Typography variant="h5">{metric}</Typography>
+          <Typography variant="h4">{value}{unit}</Typography>
+          <Typography variant="subtitle2">@{timeStamp}</Typography>
         </CardContent>
       </Card>
     );
@@ -49,8 +53,7 @@ export default function MetricsInfoBoxes() {
 
   return (
     <div hidden={selectedMetrics.length === 0} className={classes.root}>
-      <Typography variant="h2" align="center">Info</Typography>
-      { stateStatus === 'loading' && <CircularProgress color="secondary" align="center" />}
+      <Typography variant="h3" align="center">Currently</Typography>
       {selectedMetricsInfo.map(m => (renderCard(m)))}
     </div>
   );

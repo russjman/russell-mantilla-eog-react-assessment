@@ -39,7 +39,7 @@ export const fetchSelectedMetricsChartData = createAsyncThunk('metrics/fetchSele
   }`;
   const myCurrentDate = new Date();
   const after = new Date(myCurrentDate);
-  after.setMinutes(after.getMinutes() - 1);
+  after.setMinutes(after.getMinutes() - 30);
   const variables = selectedMetrics.map(m => ({ metricName: m, after: after.valueOf() }));
   const data = await graphQLClient.request(query, { input: [...variables] });
   return data.getMultipleMeasurements;
@@ -68,6 +68,9 @@ export const metricsSlice = createSlice({
     deselectMetric: (state, action) => {
       const selectedMetrics = [...state.selected];
       state.selected = selectedMetrics.filter(m => m !== action.payload);
+    },
+    clearSelectedMetrics: (state) => {
+      state.selected = [];
     },
   },
   extraReducers: {
@@ -100,12 +103,13 @@ export const metricsSlice = createSlice({
     },
     [fetchSelectedMetricsChartData.fulfilled]: (state, action) => {
       const payload = [...action.payload];
+      const options = { timeZone: 'UTC', timeZoneName: 'short' };
 
       // format at to time
       payload.forEach(metric => {
         metric.measurements.forEach(point => {
           const time = new Date(point.at);
-          point.at = time.toTimeString();
+          point.at = time.toLocaleTimeString('en-US', options);
         });
       });
       state.status = 'success';
@@ -119,6 +123,6 @@ export const metricsSlice = createSlice({
 });
 
 // Action creators are generated for each case reducer function
-export const { selectMetric, deselectMetric } = metricsSlice.actions;
+export const { selectMetric, deselectMetric, clearSelectedMetrics } = metricsSlice.actions;
 
 export default metricsSlice.reducer;
