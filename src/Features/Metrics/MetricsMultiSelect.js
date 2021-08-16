@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import {
   Container,
@@ -31,6 +31,7 @@ const useStyles = makeStyles((theme) => ({
 function MetricsMultiSelect() {
   const dispatch = useDispatch();
   const classes = useStyles();
+  const [open, setOpen] = useState(false);
   const metrics = useSelector(state => state.metrics.all);
   const selectedMetrics = useSelector(state => state.metrics.selected);
   const selectHandler = (e) => {
@@ -62,7 +63,9 @@ function MetricsMultiSelect() {
         <Select
           id="metrics-multi-select-field"
           labelId="metrics-multi-select-field"
+          open={open}
           value={selectedMetrics}
+          onClick={() => setOpen(!open)}
           onChange={selectHandler}
           multiple
           renderValue={(selected) => (

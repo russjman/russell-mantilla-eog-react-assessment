@@ -72,7 +72,6 @@ export default function MetricsChart() {
     return mergedLineData;
   };
 
-  console.log('MetricsChart randomcolors', randomColors);
   return (
     <div className={classes.root} hidden={selectedMetrics.length === 0}>
       <Typography variant="h3" align="center">Last 30 mins</Typography>
