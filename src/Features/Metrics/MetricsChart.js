@@ -32,6 +32,9 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const randomColors = Array.from({ length: 6 },
+  () => Math.floor(Math.random() * 16777215).toString(16));
+
 export default function MetricsChart() {
   const dispatch = useDispatch();
   const classes = useStyles();
@@ -69,11 +72,14 @@ export default function MetricsChart() {
     return mergedLineData;
   };
 
+  console.log('MetricsChart randomcolors', randomColors);
   return (
     <div className={classes.root} hidden={selectedMetrics.length === 0}>
       <Typography variant="h3" align="center">Last 30 mins</Typography>
-      <Button variant="contained" type="button" color="secondary" className={classes.button} onClick={() => setCombined(!isCombined)}>combined / separate</Button>
-      {!isCombined && selectedMetricsChartData.map(m => (
+      <Button variant="contained" type="button" color="secondary" className={classes.button} onClick={() => setCombined(!isCombined)}>
+        {isCombined ? 'separate' : 'combined' }
+      </Button>
+      {!isCombined && selectedMetricsChartData.map((m, i) => (
         <Paper key={m.metric} elevation={3} className={classes.chartContainer}>
           <Typography variant="h4">{m.metric}</Typography>
           <ResponsiveContainer width="99%" height={400}>
@@ -84,7 +90,7 @@ export default function MetricsChart() {
               <Tooltip filterNull={false} />
               <Line
                 dataKey='value'
-                stroke={`#${Math.floor(Math.random() * 16777215).toString(16)}`}
+                stroke={`#${randomColors[i]}`}
                 dot={false}
                 type='linear'
               />
@@ -100,11 +106,11 @@ export default function MetricsChart() {
               <YAxis domain={['auto', 'auto']} />
               <CartesianGrid stroke='#f5f5f5' />
               <Tooltip filterNull={false} />
-              {selectedMetricsChartData.map(m => (
+              {selectedMetricsChartData.map((m, i) => (
                 <Line
                   key={m.metric}
                   dataKey={m.metric}
-                  stroke={`#${Math.floor(Math.random() * 16777215).toString(16)}`}
+                  stroke={`#${randomColors[i]}`}
                   dot={false}
                   type='linear'
                 />
