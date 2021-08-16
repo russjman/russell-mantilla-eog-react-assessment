@@ -103,7 +103,7 @@ export const metricsSlice = createSlice({
     },
     [fetchSelectedMetricsChartData.fulfilled]: (state, action) => {
       const payload = [...action.payload];
-      const options = { timeZone: 'UTC', timeZoneName: 'short' };
+      const options = { hour: 'numeric', minute: 'numeric' };
 
       // format at to time
       payload.forEach(metric => {

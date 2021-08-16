@@ -4,6 +4,7 @@ import {
   Button, Typography, Paper, makeStyles,
 } from '@material-ui/core';
 import {
+  Legend,
   LineChart,
   Line,
   XAxis,
@@ -99,21 +100,33 @@ export default function MetricsChart() {
       ))}
       {isCombined && selectedMetricsChartData.length && (
         <Paper elevation={3} className={classes.chartContainer}>
-          <ResponsiveContainer width="99%" height={400}>
+          <ResponsiveContainer width="99%" height={500}>
             <LineChart data={getMergedChartData()}>
               <XAxis dataKey='at' />
-              <YAxis domain={['auto', 'auto']} />
               <CartesianGrid stroke='#f5f5f5' />
               <Tooltip filterNull={false} />
+              {selectedMetricsChartData.map((m) => (
+                <YAxis
+                  yAxisId={m.metric}
+                  label={{
+                    value: m.metric, angle: -90, position: 'insideLeft',
+                  }}
+                />
+              ))}
               {selectedMetricsChartData.map((m, i) => (
                 <Line
                   key={m.metric}
                   dataKey={m.metric}
+                  yAxisId={m.metric}
                   stroke={`#${randomColors[i]}`}
                   dot={false}
-                  type='linear'
+                  type='basis'
+                  margin={{
+                    top: 0, right: 0, bottom: 20, left: 0,
+                  }}
                 />
               ))}
+              <Legend verticalAlign="top" />
             </LineChart>
           </ResponsiveContainer>
         </Paper>
