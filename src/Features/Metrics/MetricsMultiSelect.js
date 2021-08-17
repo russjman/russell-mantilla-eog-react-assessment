@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import {
-  Container,
+  // Container,
   IconButton,
   FormControl,
   Select,
@@ -18,13 +18,16 @@ import {
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    marginBottom: theme.spacing(2),
+    marginBottom: theme.spacing(4),
     position: 'relative',
+    ' & .MuiInputBase-formControl': {
+      minHeight: 69,
+    },
   },
   button: {
     position: 'absolute',
-    bottom: 5,
-    right: 50,
+    bottom: 10,
+    right: 24,
   },
 }));
 
@@ -57,7 +60,7 @@ function MetricsMultiSelect() {
   }, []);
 
   return (
-    <Container className={classes.root}>
+    <div className={classes.root}>
       <Typography variant="h1" align="center">Metrics</Typography>
       <FormControl variant="outlined" fullWidth>
         <Select
@@ -81,7 +84,7 @@ function MetricsMultiSelect() {
         </Select>
       </FormControl>
       <IconButton onClick={clearHandler} className={classes.button}><ClearIcon /></IconButton>
-    </Container>
+    </div>
   );
 }
 

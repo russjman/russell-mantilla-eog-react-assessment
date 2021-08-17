@@ -14,14 +14,17 @@ import MetricsChart from './Features/Metrics/MetricsChart';
 const theme = createTheme({
   palette: {
     primary: {
-      main: 'rgb(39,49,66)',
+      main: 'rgb(73, 88, 103)',
     },
     secondary: {
-      main: 'rgb(197,208,222)',
+      main: 'rgb(189, 213, 234)',
     },
     background: {
-      default: 'rgb(226,231,238)',
+      default: 'rgb(247, 247, 255)',
     },
+  },
+  typography: {
+    fontSize: 12,
   },
 });
 

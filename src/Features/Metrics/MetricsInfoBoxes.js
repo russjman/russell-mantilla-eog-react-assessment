@@ -53,7 +53,7 @@ export default function MetricsInfoBoxes() {
 
   return (
     <div hidden={selectedMetrics.length === 0} className={classes.root}>
-      <Typography variant="h3" align="center">Currently</Typography>
+      <Typography variant="h3" align="center" gutterBottom>Currently</Typography>
       {selectedMetricsInfo.map(m => (renderCard(m)))}
     </div>
   );

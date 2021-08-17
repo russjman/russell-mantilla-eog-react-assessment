@@ -30,6 +30,11 @@ const useStyles = makeStyles((theme) => ({
     position: 'absolute',
     top: 0,
     right: 0,
+    [theme.breakpoints.down('xs')]: {
+      position: 'inherit',
+      display: 'block',
+      margin: '0 auto',
+    },
   },
 }));
 
@@ -75,12 +80,15 @@ export default function MetricsChart() {
 
   return (
     <div className={classes.root} hidden={selectedMetrics.length === 0}>
-      <Typography variant="h3" align="center">Last 30 mins</Typography>
-      <Button variant="contained" type="button" color="secondary" className={classes.button} onClick={() => setCombined(!isCombined)}>
-        {isCombined ? 'separate' : 'combined' }
-      </Button>
+      <Typography variant="h3" align="center" gutterBottom>
+        Last 30 mins
+        <Button variant="contained" type="button" color="secondary" className={classes.button} onClick={() => setCombined(!isCombined)}>
+          {isCombined ? 'separate' : 'combined' }
+        </Button>
+      </Typography>
+
       {!isCombined && selectedMetricsChartData.map((m, i) => (
-        <Paper key={m.metric} elevation={3} className={classes.chartContainer}>
+        <Paper key={`metric-line-chart-${m.metric}`} elevation={3} className={classes.chartContainer}>
           <Typography variant="h4">{m.metric}</Typography>
           <ResponsiveContainer width="99%" height={400}>
             <LineChart data={m.measurements}>
@@ -107,6 +115,7 @@ export default function MetricsChart() {
               <Tooltip filterNull={false} />
               {selectedMetricsChartData.map((m) => (
                 <YAxis
+                  key={`yAxis-${m.metric}`}
                   yAxisId={m.metric}
                   label={{
                     value: m.metric, angle: -90, position: 'insideLeft',
@@ -115,7 +124,7 @@ export default function MetricsChart() {
               ))}
               {selectedMetricsChartData.map((m, i) => (
                 <Line
-                  key={m.metric}
+                  key={`metric-line-${m.metric}`}
                   dataKey={m.metric}
                   yAxisId={m.metric}
                   stroke={`#${randomColors[i]}`}
