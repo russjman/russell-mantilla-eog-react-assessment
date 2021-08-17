@@ -93,7 +93,7 @@ export default function MetricsChart() {
           <ResponsiveContainer width="99%" height={400}>
             <LineChart data={m.measurements}>
               <XAxis dataKey='at' />
-              <YAxis domain={['auto', 'auto']} />
+              <YAxis domain={['auto', 'auto']} unit={m.measurements[0].unit} />
               <CartesianGrid stroke='#f5f5f5' />
               <Tooltip filterNull={false} />
               <Line
@@ -117,6 +117,7 @@ export default function MetricsChart() {
                 <YAxis
                   key={`yAxis-${m.metric}`}
                   yAxisId={m.metric}
+                  unit={m.measurements[0].unit}
                   label={{
                     value: m.metric, angle: -90, position: 'insideLeft',
                   }}
